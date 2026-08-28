@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumina Corporativo</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#18202a;--muted:#6b7280;--line:#e5e7eb;--accent:#1f2937;--ok:#15803d;--bad:#b91c1c}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{max-width:1100px;margin:auto;padding:24px}
+header{background:var(--accent);color:#fff;border-radius:18px;padding:24px;margin-bottom:18px}
+header h1{margin:0 0 6px;font-size:28px} header p{margin:0;color:#d1d5db}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card h2{font-size:17px;margin:0 0 16px}.full{grid-column:1/-1}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px} input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;background:#fff}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.nbr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{background:#f8fafc;border-radius:12px;padding:13px}.metric small{display:block;color:var(--muted);font-size:11px}.metric strong{font-size:21px}
+.result{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:stretch}.hero{border-radius:16px;padding:22px;background:#f8fafc}.status{font-size:25px;font-weight:800;margin:8px 0}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.big{font-size:40px;font-weight:800}.bar{height:10px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin:14px 0}.bar span{display:block;height:100%;background:#374151;width:0}
+button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;background:#111827;color:#fff;margin-top:15px}.secondary{background:#e5e7eb;color:#111827;margin-left:8px}
+.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+footer{font-size:11px;color:var(--muted);margin:18px 2px}
+@media(max-width:760px){.app{padding:12px}.grid,.result{grid-template-columns:1fr}.full{grid-column:auto}.row,.nbr{grid-template-columns:1fr 1fr}header h1{font-size:23px}.big{font-size:34px}}
+</style>
+
+<style>
+/* Alinhamento dos campos de dimensões */
+.dimension-fields{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  align-items:end;
+}
+.dimension-fields .field{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.dimension-fields label{
+  height:30px;
+  display:flex;
+  align-items:flex-start;
+  margin:0 0 6px;
+  line-height:1.25;
+}
+.dimension-fields input{
+  height:44px;
+  width:100%;
+  margin:0;
+}
+@media(max-width:760px){
+  .dimension-fields{grid-template-columns:1fr 1fr;}
+  .dimension-fields .field:last-child{grid-column:1/-1;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>💡 LUXPRO</h1>
+  <p>Pré-dimensionamento luminotécnico para ambientes corporativos</p>
+</header>
+
+<div class="grid">
+<section class="card">
+<h2>1. Ambiente e atividade</h2>
+<label>Nome do projeto</label><input id="project" placeholder="Ex.: Escritório Sette">
+<label>Atividade</label>
+<select id="activity">
+<option value="500|19|80|Escrever, teclar, ler e processar dados">Escrever, teclar, ler e processar dados — 500 lux</option>
+<option value="500|19|80|Sala de reunião / conferência">Sala de reunião / conferência — 500 lux</option>
+<option value="300|22|80|Recepção">Recepção — 300 lux</option>
+<option value="200|25|80|Arquivo">Arquivo — 200 lux</option>
+<option value="750|16|80|Desenho técnico">Desenho técnico — 750 lux</option>
+<option value="300|25|80|Circulação / corredor">Circulação / corredor — 300 lux</option>
+<option value="200|22|80|Refeitório / sala de jantar">Refeitório / sala de jantar — 200 lux</option>
+</select>
+<div class="nbr" style="margin-top:14px">
+<div class="metric"><small>Em mantida</small><strong id="luxN">500</strong> lux</div>
+<div class="metric"><small>UGRₗ máximo</small><strong id="ugrN">19</strong></div>
+<div class="metric"><small>Ra mínimo</small><strong id="raN">80</strong></div>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Dimensões do ambiente</h2>
+<div class="dimension-fields">
+<div class="field"><label>Comprimento (m)</label><input id="length" type="number" value="10" min="0" step="0.01"></div>
+<div class="field"><label>Largura (m)</label><input id="width" type="number" value="6" min="0" step="0.01"></div>
+<div class="field"><label>Pé-direito (m)</label><input id="height" type="number" value="2.8" min="0" step="0.01"></div>
+</div>
+<div class="metric" style="margin-top:12px"><small>Área do ambiente</small><strong id="area">60,00 m²</strong></div>
+</section>
+
+<section class="card">
+<h2>3. Luminárias</h2>
+<div id="luminarias"></div>
+<button type="button" id="addLumBtn">＋ Adicionar luminária</button>
+<button type="button" class="secondary" id="clearLumsBtn">Limpar modelos</button>
+<div class="note">Você pode combinar vários modelos no mesmo ambiente. Cada modelo pode ter fluxo, potência, quantidade e fatores próprios.</div>
+</section>
+
+<section class="card">
+<h2>4. Resultado</h2>
+<div class="result">
+<div class="hero">
+<div style="color:#6b7280;font-size:13px">Iluminância mantida estimada</div>
+<div class="big" id="luxCalc">384 lux</div>
+<div class="bar"><span id="bar"></span></div>
+<div class="status" id="status">NÃO ATENDE</div>
+<div class="note">O resultado é um pré-dimensionamento. UGR e uniformidade exigem verificação luminotécnica adequada.</div>
+</div>
+<div>
+<div class="metric"><small>Fluxo total</small><strong id="fluxTotal">36.000 lm</strong></div>
+<div class="metric" style="margin-top:8px"><small>Potência instalada</small><strong id="powerTotal">360 W</strong></div>
+<div class="metric" style="margin-top:8px"><small>Densidade de potência</small><strong id="density">6,00 W/m²</strong></div>
+<div class="metric" style="margin-top:8px"><small>Ra informado</small><strong id="raResult">80</strong></div>
+</div>
+</div>
+</section>
+</div>
+
+<footer>
+Base normativa de referência: ABNT NBR ISO/CIE 8995-1:2013 — Iluminação de ambientes de trabalho — Parte 1: Interior.
+Os valores exibidos são parâmetros de referência para as atividades selecionadas e não substituem a consulta à norma e a verificação luminotécnica completa.
+</footer>
+</div>
+
+<script>
+(() => {
+  let lums = [
+    {name:"", lm:"", w:"", q:"", uf:"", mf:"", ra:""}
+  ];
+
+  const $ = id => document.getElementById(id);
+  const fmt = (n,d=2) => Number(n).toLocaleString('pt-BR',{
+    minimumFractionDigits:d, maximumFractionDigits:d
+  });
+
+  function updateNBR(){
+    const parts = $("activity").value.split("|");
+    $("luxN").textContent = parts[0];
+    $("ugrN").textContent = parts[1];
+    $("raN").textContent = parts[2];
+    calc();
+  }
+
+  function renderLums(){
+    const box = $("luminarias");
+    box.innerHTML = "";
+
+    if(lums.length === 0){
+      box.innerHTML = '<div style="border:1px dashed #d1d5db;border-radius:12px;padding:18px;text-align:center;color:#6b7280;margin-bottom:10px">Nenhuma luminária adicionada.<br><strong style="color:#18202a">Clique em “Adicionar luminária”</strong> para incluir um modelo.</div>';
+      return;
+    }
+
+    lums.forEach((x,i) => {
+      const card = document.createElement("div");
+      card.style.cssText =
+        "border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:10px;background:#fafafa";
+
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <strong>Luminária ${i+1}</strong>
+          <button type="button" class="deleteLum" data-index="${i}"
+            style="margin:0;padding:7px 10px">Excluir</button>
+        </div>
+        <label>Nome / modelo</label>
+        <input class="lumInput" data-index="${i}" data-key="name"
+          value="${escapeHtml(x.name)}" placeholder="Digite o nome ou modelo">
+
+        <div class="row">
+          <div><label>Fluxo (lm)</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="lm" value="${x.lm}" min="0"></div>
+          <div><label>Potência (W)</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="w" value="${x.w}" min="0" step="0.1"></div>
+          <div><label>Quantidade</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="q" value="${x.q}" min="0" step="1"></div>
+        </div>
+
+        <div class="row">
+          <div><label>Fator de utilização</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="uf" value="${x.uf}" min="0" max="1" step="0.01"></div>
+          <div><label>Fator de manutenção</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="mf" value="${x.mf}" min="0" max="1" step="0.01"></div>
+          <div><label>Ra</label>
+            <input class="lumInput" type="number" data-index="${i}" data-key="ra" value="${x.ra}" min="0" max="100"></div>
+        </div>`;
+      box.appendChild(card);
+    });
+  }
+
+  function escapeHtml(v){
+    return String(v).replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  function addLum(){
+    lums.push({name:"",lm:"",w:"",q:"",uf:"",mf:"",ra:""});
+    renderLums();
+    calc();
+  }
+
+  function deleteLum(index){
+    lums.splice(index,1);
+    renderLums();
+    calc();
+  }
+
+  function clearLums(){
+    if(!confirm("Deseja limpar os modelos de luminárias e voltar ao modelo inicial?")) return;
+    lums = [];
+    renderLums();
+    calc();
+  }
+
+  function calc(){
+    const target = Number($("activity").value.split("|")[0]) || 0;
+    const area = (Number($("length").value)||0) * (Number($("width").value)||0);
+    $("area").textContent = fmt(area) + " m²";
+
+    let totalFlux=0, totalPower=0, effectiveFlux=0;
+    lums.forEach(x=>{
+      totalFlux += x.lm*x.q;
+      totalPower += x.w*x.q;
+      effectiveFlux += x.lm*x.q*x.uf*x.mf;
+    });
+
+    const maintained = area>0 ? effectiveFlux/area : 0;
+    const density = area>0 ? totalPower/area : 0;
+    const active = lums.filter(x=>x.q>0);
+    const ra = active.length ? Math.min(...active.map(x=>x.ra)) : 0;
+
+    $("luxCalc").textContent = fmt(maintained,0) + " lux";
+    $("fluxTotal").textContent = fmt(totalFlux,0) + " lm";
+    $("powerTotal").textContent = fmt(totalPower,0) + " W";
+    $("density").textContent = fmt(density) + " W/m²";
+    $("raResult").textContent = ra;
+
+    const ok = maintained >= target;
+    $("status").textContent = ok ? "✓ ATENDE" : "✕ NÃO ATENDE";
+    $("status").className = "status " + (ok ? "ok" : "bad");
+    $("bar").style.width = Math.min(100, target ? maintained/target*100 : 0) + "%";
+
+    let detail = $("summary");
+    if(!detail){
+      detail=document.createElement("div");
+      detail.id="summary";
+      detail.className="note";
+      $("powerTotal").parentElement.parentElement.appendChild(detail);
+    }
+    detail.innerHTML = "<strong>Composição:</strong> " +
+      lums.map(x => `${x.q}× ${escapeHtml(x.name)}`).join(" + ");
+  }
+
+  function init(){
+    // Main action buttons
+    $("addLumBtn").addEventListener("click", addLum);
+    $("clearLumsBtn").addEventListener("click", clearLums);
+
+    // Event delegation: works even after luminária cards are re-rendered.
+    $("luminarias").addEventListener("click", e=>{
+      const btn=e.target.closest(".deleteLum");
+      if(btn) deleteLum(Number(btn.dataset.index));
+    });
+
+    $("luminarias").addEventListener("input", e=>{
+      const input=e.target.closest(".lumInput");
+      if(!input) return;
+      const i=Number(input.dataset.index);
+      const key=input.dataset.key;
+      lums[i][key] = key==="name" ? input.value : (parseFloat(input.value)||0);
+      calc();
+    });
+
+    $("activity").addEventListener("change", updateNBR);
+    ["length","width","height"].forEach(id => $(id).addEventListener("input",calc));
+
+    renderLums();
+    updateNBR();
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
+</script>
+</body>
+</html>
