@@ -1,0 +1,13 @@
+CÁLCULO DE TELA TENSIONADA — PROTÓTIPO PWA
+
+Arquivos:
+- index.html: aplicativo e cálculos
+- manifest.webmanifest: configuração instalável
+- sw.js: cache offline
+
+IMPORTANTE:
+1. Service workers/PWA normalmente exigem HTTPS ou localhost. Abrir index.html diretamente como arquivo permite testar a interface e cálculos, mas não instala o PWA nem garante o cache offline.
+2. Para instalar no Android/iPhone, publique estes arquivos em hospedagem HTTPS. Abra a URL uma vez com internet, aguarde carregar e use "Adicionar à tela inicial" (iPhone: Compartilhar > Adicionar à Tela de Início; Android: menu do navegador > Instalar/Adicionar à tela inicial).
+3. Projetos são armazenados no localStorage do navegador deste aparelho. Não limpe os dados do navegador sem exportar backup JSON. O histórico não sincroniza automaticamente entre dispositivos.
+4. Protótipo inicial: cálculo geométrico e dimensionamento de fontes são estimativas. Não substituem validação da ficha técnica da fita, fontes, cabos, queda de tensão, proteção elétrica, ventilação e instalação.
+5. A regra geométrica está implementada como distribuição centralizada com espaçamento igual à profundidade, iniciando por uma referência de 5 cm; em telas com dimensões especiais, confirme o critério executivo Lumi Frame.

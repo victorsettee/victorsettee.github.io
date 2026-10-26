@@ -1,0 +1,10 @@
+{
+  "name": "Cálculo de Tela Tensionada",
+  "short_name": "Cálculo de Tela",
+  "description": "Cálculo offline de distribuição e dimensionamento preliminar de telas tensionadas",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7fa",
+  "theme_color": "#17649a",
+  "icons": []
+}
